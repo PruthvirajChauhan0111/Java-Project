@@ -107,6 +107,27 @@ public class MiniBank {
                     + accountStore.getTransactionHistory().size());
 
             System.out.println();
+            System.out.println("Repository<Account>:");
+            Repository<Account> repository = new Repository<>();
+            repository.saveAll(accounts[0], accounts[1], accounts[2],
+                    extraSavings, extraCurrent);
+            String lookupId = accounts[1].getAccountNumber();
+            System.out.println("  Found " + lookupId + ": "
+                    + repository.findById(lookupId));
+            System.out.println("  All repository entries:");
+            for (Account account : repository.findAll()) {
+                System.out.println("    " + account);
+            }
+            System.out.printf("  Average balance: Rs. %.2f%n",
+                    Repository.average(new Long[] {
+                        accounts[0].getBalance(),
+                        accounts[1].getBalance(),
+                        accounts[2].getBalance(),
+                        extraSavings.getBalance(),
+                        extraCurrent.getBalance()
+                    }));
+
+            System.out.println();
             System.out.println("Interest rates:");
             for (Account account : accounts) {
                 System.out.printf("  %s (%s): %.1f%% (yearly interest: Rs. %.2f)%n",
