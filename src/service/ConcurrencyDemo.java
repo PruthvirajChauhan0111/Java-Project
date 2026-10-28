@@ -15,13 +15,16 @@ public class ConcurrencyDemo {
         System.out.println("Transaction pool demo:");
         Account account = new SavingsAccount("Pool Account", 1000, 0);
         TransactionProcessor processor = new TransactionProcessor();
+        processor.addAccount(account);
+        Account sharedAccount = processor.getAccount(account.getAccountNumber());
 
         for (int i = 0; i < 20; i++) {
             TransactionType type = (i % 2 == 0)
                     ? TransactionType.DEPOSIT
                     : TransactionType.WITHDRAW;
             long amount = (type == TransactionType.DEPOSIT) ? 100 : 50;
-            processor.submit(new TransactionTask(new TransactionRequest(account, type, amount)));
+            processor.submit(new TransactionTask(
+                    new TransactionRequest(sharedAccount, type, amount)));
         }
 
         processor.stop();

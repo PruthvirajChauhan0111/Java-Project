@@ -88,6 +88,25 @@ public class MiniBank {
             }
 
             System.out.println();
+            System.out.println("Account store sorted by balance:");
+            AccountStore accountStore = new AccountStore();
+            for (Account account : accounts) {
+                accountStore.add(account);
+            }
+            Account extraSavings = new SavingsAccount("Neha Kapoor", 2500, 500);
+            Account extraCurrent = new CurrentAccount("Vikram Shah", -750, 3000);
+            accountStore.add(extraSavings);
+            accountStore.add(extraCurrent);
+            accountStore.addTransaction("Added " + extraSavings.getAccountNumber());
+            accountStore.addTransaction("Added " + extraCurrent.getAccountNumber());
+            for (Account account : accountStore.sortedByBalance()) {
+                System.out.println("  " + account);
+            }
+            System.out.println("  Store size: " + accountStore.getAll().size());
+            System.out.println("  History entries: "
+                    + accountStore.getTransactionHistory().size());
+
+            System.out.println();
             System.out.println("Interest rates:");
             for (Account account : accounts) {
                 System.out.printf("  %s (%s): %.1f%% (yearly interest: Rs. %.2f)%n",
