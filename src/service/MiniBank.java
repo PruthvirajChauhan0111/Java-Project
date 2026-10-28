@@ -1,4 +1,19 @@
+package service;
+
 import java.util.Scanner;
+import model.Account;
+import model.BankInfo;
+import model.Command;
+import model.CurrentAccount;
+import model.FixedDepositAccount;
+import model.MenuOption;
+import model.SavingsAccount;
+import model.WithdrawRule;
+import util.CommandParser;
+import util.StatementFormatter;
+import util.Validator;
+
+import static util.Validator.isValidEmail;
 
 public class MiniBank {
 
@@ -29,15 +44,30 @@ public class MiniBank {
             System.out.println();
             System.out.println("Interest rates:");
             for (Account account : accounts) {
-                System.out.printf("  %s (%s): %.1f%%%n",
+                System.out.printf("  %s (%s): %.1f%% (yearly interest: Rs. %.2f)%n",
                         account.getAccountNumber(),
                         account.getClass().getSimpleName(),
-                        account.interestRate());
+                        account.interestRate(),
+                        account.yearlyInterest());
                 if (account instanceof FixedDepositAccount fixedDeposit) {
                     System.out.println("    " + fixedDeposit.getAccountNumber()
                             + " is locked; withdrawals are not allowed.");
                 }
             }
+
+            System.out.println();
+            System.out.println("Withdraw rules:");
+            WithdrawRule noOverdraft = new WithdrawRule() {
+                @Override
+                public boolean allow(Account account, long amount) {
+                    return account.getBalance() - amount >= 0;
+                }
+            };
+            System.out.println("  anonymous rule allows Rs. 500 from AC0001: "
+                    + noOverdraft.allow(accounts[0], 500));
+            WithdrawRule accountRule = (account, amount) -> account.canWithdraw(amount);
+            System.out.println("  lambda rule allows Rs. 100 from AC0003: "
+                    + accountRule.allow(accounts[2], 100));
 
             System.out.println();
             System.out.println("Equality check:");
@@ -60,9 +90,9 @@ public class MiniBank {
             System.out.println("  mobile 9876543210 -> " + Validator.isValidMobile("9876543210"));
             System.out.println("  mobile 12345 -> " + Validator.isValidMobile("12345"));
             System.out.println("  email asha@example.com -> "
-                    + Validator.isValidEmail("asha@example.com"));
+                    + isValidEmail("asha@example.com"));
             System.out.println("  email asha.example.com -> "
-                    + Validator.isValidEmail("asha.example.com"));
+                    + isValidEmail("asha.example.com"));
             System.out.println("  PAN ABCDE1234F -> " + Validator.isValidPan("ABCDE1234F"));
             System.out.println("  PAN ABC1234F -> " + Validator.isValidPan("ABC1234F"));
             System.out.println("  IFSC SBIN0001234 -> " + Validator.isValidIfsc("SBIN0001234"));
