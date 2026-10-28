@@ -1,5 +1,8 @@
 package service;
 
+import exception.BankException;
+import exception.InsufficientFundsException;
+import exception.InvalidAmountException;
 import java.util.Scanner;
 import model.Account;
 import model.BankInfo;
@@ -10,6 +13,7 @@ import model.MenuOption;
 import model.SavingsAccount;
 import model.WithdrawRule;
 import util.AnnotationValidator;
+import util.AuditLog;
 import util.CommandParser;
 import util.StatementFormatter;
 import util.Validator;
@@ -21,8 +25,10 @@ public class MiniBank {
     private static final BankInfo BANK = new BankInfo("MiniBank", "Main Branch");
 
     public static void main(String[] args) {
-        try (Scanner scanner = new Scanner(System.in)) {
+        try (Scanner scanner = new Scanner(System.in);
+                AuditLog auditLog = new AuditLog("MiniBank session")) {
             printHeader();
+            auditLog.record("Session started.");
 
             Account[] accounts = {
                 new SavingsAccount("Asha Verma", 5000, 1000),
@@ -30,11 +36,43 @@ public class MiniBank {
                 new FixedDepositAccount("Priya Nair", 12000)
             };
 
-            accounts[0].deposit(2500);
-            accounts[1].deposit(1000);
-            accounts[1].withdraw(4000);
-            accounts[2].withdraw(5000);
-            accounts[2].deposit(3000);
+            System.out.println();
+            System.out.println("Transaction processing:");
+            try {
+                accounts[0].deposit(2500);
+                accounts[1].deposit(1000);
+                accounts[1].withdraw(4000);
+                accounts[2].deposit(3000);
+            } catch (InvalidAmountException e) {
+                System.out.println("  Invalid amount: " + e.getMessage());
+            } catch (InsufficientFundsException e) {
+                System.out.println("  Withdrawal failed: " + e.getMessage()
+                        + " (shortfall: Rs. " + e.getShortfall() + ")");
+            } finally {
+                System.out.println("  Transaction batch finished.");
+            }
+
+            try {
+                accounts[2].withdraw(5000);
+            } catch (InsufficientFundsException e) {
+                System.out.println("  Locked account withdrawal failed: " + e.getMessage()
+                        + " (shortfall: Rs. " + e.getShortfall() + ")");
+            } catch (InvalidAmountException e) {
+                System.out.println("  Invalid withdrawal: " + e.getMessage());
+            }
+
+            try {
+                accounts[1].deposit(0);
+            } catch (InvalidAmountException e) {
+                System.out.println("  Invalid deposit rejected: " + e.getMessage());
+            }
+
+            try {
+                accounts[0].transfer(accounts[1], 1000);
+                System.out.println("  Transfer successful.");
+            } catch (BankException e) {
+                System.out.println("  Transfer failed: " + e.getMessage());
+            }
 
             System.out.println();
             System.out.println("Account summary:");
@@ -127,6 +165,7 @@ public class MiniBank {
                     printMenu();
                 }
             }
+            auditLog.record("Session completed.");
         }
     }
 

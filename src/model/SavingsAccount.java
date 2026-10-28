@@ -19,6 +19,11 @@ public class SavingsAccount extends Account {
         return getBalance() - amount >= minBalance;
     }
 
+    @Override
+    protected long availableBalance() {
+        return getBalance() - minBalance;
+    }
+
     public long getMinBalance() {
         return minBalance;
     }

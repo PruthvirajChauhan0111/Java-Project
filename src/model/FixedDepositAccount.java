@@ -15,4 +15,9 @@ public class FixedDepositAccount extends Account {
     public boolean canWithdraw(long amount) {
         return false;
     }
+
+    @Override
+    protected long availableBalance() {
+        return 0;
+    }
 }

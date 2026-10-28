@@ -1,5 +1,9 @@
 package model;
 
+import exception.AccountNotFoundException;
+import exception.BankException;
+import exception.InsufficientFundsException;
+import exception.InvalidAmountException;
 import model.annotation.Id;
 import model.annotation.Positive;
 
@@ -31,20 +35,46 @@ public abstract class Account implements Transactable, InterestBearing {
     }
 
     @Override
-    public void deposit(long amount) {
+    public void deposit(long amount) throws InvalidAmountException {
         if (amount <= 0) {
-            return;
+            throw new InvalidAmountException("Deposit amount must be greater than zero.");
         }
         balance += amount;
     }
 
     @Override
-    public boolean withdraw(long amount) {
-        if (amount <= 0 || !canWithdraw(amount)) {
-            return false;
+    public boolean withdraw(long amount)
+            throws InsufficientFundsException, InvalidAmountException {
+        if (amount <= 0) {
+            throw new InvalidAmountException("Withdrawal amount must be greater than zero.");
+        }
+        if (!canWithdraw(amount)) {
+            long shortfall = Math.max(0, amount - availableBalance());
+            throw new InsufficientFundsException(
+                    "Insufficient funds for this withdrawal.", shortfall);
         }
         balance -= amount;
         return true;
+    }
+
+    public void transfer(Account to, long amount) throws BankException {
+        try {
+            if (to == null) {
+                throw new AccountNotFoundException("Destination account not found.");
+            }
+            withdraw(amount);
+            to.deposit(amount);
+        } catch (InsufficientFundsException e) {
+            throw new BankException("Transfer failed: " + e.getMessage(), e);
+        } catch (InvalidAmountException e) {
+            throw new BankException("Transfer failed: " + e.getMessage(), e);
+        } finally {
+            System.out.println("  Transfer attempt of Rs. " + amount + " finished.");
+        }
+    }
+
+    protected long availableBalance() {
+        return balance;
     }
 
     @Override
