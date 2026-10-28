@@ -9,21 +9,34 @@ public class MiniBank {
             printHeader();
 
             Account[] accounts = {
-                new Account("Asha Verma", 5000),
-                new Account("Rahul Mehta"),
-                new Account("Priya Nair", 12000)
+                new SavingsAccount("Asha Verma", 5000, 1000),
+                new CurrentAccount("Rahul Mehta", 0, 5000),
+                new FixedDepositAccount("Priya Nair", 12000)
             };
 
             accounts[0].deposit(2500);
             accounts[1].deposit(1000);
-            accounts[2].withdraw(15000);
-            accounts[2].deposit(3000);
+            accounts[1].withdraw(4000);
             accounts[2].withdraw(5000);
+            accounts[2].deposit(3000);
 
             System.out.println();
             System.out.println("Account summary:");
             for (Account account : accounts) {
                 System.out.println("  " + account);
+            }
+
+            System.out.println();
+            System.out.println("Interest rates:");
+            for (Account account : accounts) {
+                System.out.printf("  %s (%s): %.1f%%%n",
+                        account.getAccountNumber(),
+                        account.getClass().getSimpleName(),
+                        account.interestRate());
+                if (account instanceof FixedDepositAccount fixedDeposit) {
+                    System.out.println("    " + fixedDeposit.getAccountNumber()
+                            + " is locked; withdrawals are not allowed.");
+                }
             }
 
             System.out.println();
