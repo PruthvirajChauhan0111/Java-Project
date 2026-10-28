@@ -53,4 +53,26 @@ public class Account {
     public boolean isActive() {
         return active;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Account[number=%s, owner=%s, balance=%d]",
+                accountNumber, ownerName, balance);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Account other)) {
+            return false;
+        }
+        return accountNumber.equals(other.accountNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return accountNumber.hashCode();
+    }
 }

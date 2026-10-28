@@ -23,10 +23,23 @@ public class MiniBank {
             System.out.println();
             System.out.println("Account summary:");
             for (Account account : accounts) {
-                System.out.printf("  %s (%s): Rs. %d%n",
-                        account.getOwnerName(),
-                        account.getAccountNumber(),
-                        account.getBalance());
+                System.out.println("  " + account);
+            }
+
+            System.out.println();
+            System.out.println("Equality check:");
+            System.out.println("  accounts[0].equals(accounts[0]) = "
+                    + accounts[0].equals(accounts[0]));
+            System.out.println("  accounts[0].equals(accounts[1]) = "
+                    + accounts[0].equals(accounts[1]));
+
+            System.out.println();
+            System.out.println("Type check:");
+            Object candidate = accounts[2];
+            if (candidate instanceof Account account) {
+                System.out.println("  " + account + " is an Account.");
+            } else {
+                System.out.println("  The object is not an Account.");
             }
 
             printMenu();
