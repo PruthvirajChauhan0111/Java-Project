@@ -24,7 +24,7 @@ public class MiniBank {
 
     private static final BankInfo BANK = new BankInfo("MiniBank", "Main Branch");
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         try (Scanner scanner = new Scanner(System.in);
                 AuditLog auditLog = new AuditLog("MiniBank session")) {
             printHeader();
@@ -154,6 +154,22 @@ public class MiniBank {
             for (String error : annotationErrors) {
                 System.out.println("  " + error);
             }
+
+            System.out.println();
+            System.out.println("Thread safety demo:");
+            Account sharedAccount = new SavingsAccount("Shared Account", 0, 0);
+            Thread[] workers = new Thread[10];
+            for (int i = 0; i < workers.length; i++) {
+                workers[i] = new Thread(
+                        new AccountWorker(sharedAccount, 10_000, 1),
+                        "Worker-" + (i + 1));
+                workers[i].start();
+            }
+            for (Thread worker : workers) {
+                worker.join();
+            }
+            System.out.println("  Expected balance: " + (10 * 10_000));
+            System.out.println("  Final balance: " + sharedAccount.getBalance());
 
             printMenu();
 
