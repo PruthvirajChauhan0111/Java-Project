@@ -42,6 +42,29 @@ public class MiniBank {
                 System.out.println("  The object is not an Account.");
             }
 
+            System.out.println();
+            System.out.println("Validation check:");
+            System.out.println("  mobile 9876543210 -> " + Validator.isValidMobile("9876543210"));
+            System.out.println("  mobile 12345 -> " + Validator.isValidMobile("12345"));
+            System.out.println("  email asha@example.com -> "
+                    + Validator.isValidEmail("asha@example.com"));
+            System.out.println("  email asha.example.com -> "
+                    + Validator.isValidEmail("asha.example.com"));
+            System.out.println("  PAN ABCDE1234F -> " + Validator.isValidPan("ABCDE1234F"));
+            System.out.println("  PAN ABC1234F -> " + Validator.isValidPan("ABC1234F"));
+            System.out.println("  IFSC SBIN0001234 -> " + Validator.isValidIfsc("SBIN0001234"));
+            System.out.println("  IFSC SBIN1001234 -> " + Validator.isValidIfsc("SBIN1001234"));
+
+            System.out.println();
+            System.out.println("Command parsing:");
+            Command command = CommandParser.parse("DEPOSIT AC0001 500");
+            System.out.println("  Type: " + command.type());
+            System.out.println("  Account: " + command.accountNumber());
+            System.out.println("  Amount: " + command.amount());
+
+            System.out.println();
+            System.out.println(StatementFormatter.buildStatement(accounts[0]));
+
             printMenu();
 
             boolean running = true;
