@@ -7,6 +7,28 @@ public class MiniBank {
     public static void main(String[] args) {
         try (Scanner scanner = new Scanner(System.in)) {
             printHeader();
+
+            Account[] accounts = {
+                new Account("Asha Verma", 5000),
+                new Account("Rahul Mehta"),
+                new Account("Priya Nair", 12000)
+            };
+
+            accounts[0].deposit(2500);
+            accounts[1].deposit(1000);
+            accounts[2].withdraw(15000);
+            accounts[2].deposit(3000);
+            accounts[2].withdraw(5000);
+
+            System.out.println();
+            System.out.println("Account summary:");
+            for (Account account : accounts) {
+                System.out.printf("  %s (%s): Rs. %d%n",
+                        account.getOwnerName(),
+                        account.getAccountNumber(),
+                        account.getBalance());
+            }
+
             printMenu();
 
             boolean running = true;
