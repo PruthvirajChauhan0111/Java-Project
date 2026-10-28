@@ -62,8 +62,18 @@ public abstract class Account implements Transactable, InterestBearing {
             if (to == null) {
                 throw new AccountNotFoundException("Destination account not found.");
             }
-            withdraw(amount);
-            to.deposit(amount);
+            Account first = this;
+            Account second = to;
+            if (first.getAccountNumber().compareTo(second.getAccountNumber()) > 0) {
+                first = to;
+                second = this;
+            }
+            synchronized (first) {
+                synchronized (second) {
+                    withdraw(amount);
+                    to.deposit(amount);
+                }
+            }
         } catch (InsufficientFundsException e) {
             throw new BankException("Transfer failed: " + e.getMessage(), e);
         } catch (InvalidAmountException e) {

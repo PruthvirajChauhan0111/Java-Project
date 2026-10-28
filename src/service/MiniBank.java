@@ -171,6 +171,10 @@ public class MiniBank {
             System.out.println("  Expected balance: " + (10 * 10_000));
             System.out.println("  Final balance: " + sharedAccount.getBalance());
 
+            ConcurrencyDemo.runTransactionPoolDemo();
+            ConcurrencyDemo.runProducerConsumerDemo();
+            ConcurrencyDemo.runTransferOrderingDemo();
+
             printMenu();
 
             boolean running = true;
