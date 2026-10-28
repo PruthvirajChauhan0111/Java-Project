@@ -3,6 +3,10 @@ package service;
 import exception.BankException;
 import exception.InsufficientFundsException;
 import exception.InvalidAmountException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 import model.Account;
 import model.BankInfo;
@@ -15,7 +19,10 @@ import model.WithdrawRule;
 import util.AnnotationValidator;
 import util.AuditLog;
 import util.CommandParser;
+import util.ReportGenerator;
 import util.StatementFormatter;
+import util.StatePersister;
+import util.TransactionLog;
 import util.Validator;
 
 import static util.Validator.isValidEmail;
@@ -174,6 +181,39 @@ public class MiniBank {
             ConcurrencyDemo.runTransactionPoolDemo();
             ConcurrencyDemo.runProducerConsumerDemo();
             ConcurrencyDemo.runTransferOrderingDemo();
+
+            System.out.println();
+            System.out.println("Persistence and reporting:");
+            Path dataDirectory = Paths.get("data");
+            Path accountsFile = dataDirectory.resolve("accounts.dat");
+            Path logsDirectory = dataDirectory.resolve("logs");
+            Path reportFile = dataDirectory.resolve("report").resolve("eod-report.txt");
+            Path logFile = logsDirectory.resolve("transactions.log");
+            try {
+                Files.createDirectories(logsDirectory);
+                TransactionLog.append(logFile,
+                        "DEPOSIT " + accounts[0].getAccountNumber() + " 2500");
+                TransactionLog.append(logFile,
+                        "DEPOSIT " + accounts[1].getAccountNumber() + " 1000");
+                TransactionLog.append(logFile,
+                        "WITHDRAW " + accounts[1].getAccountNumber() + " 4000");
+                TransactionLog.append(logFile,
+                        "DEPOSIT " + accounts[2].getAccountNumber() + " 3000");
+
+                StatePersister.save(accounts, accountsFile);
+                Account[] restoredAccounts = StatePersister.load(accountsFile);
+
+                System.out.println("  Restored accounts:");
+                for (Account account : restoredAccounts) {
+                    System.out.println("    " + account);
+                }
+
+                String report = ReportGenerator.generate(logsDirectory, reportFile);
+                System.out.println();
+                System.out.println(report);
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("  Persistence error: " + e.getMessage());
+            }
 
             printMenu();
 
