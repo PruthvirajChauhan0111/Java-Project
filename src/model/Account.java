@@ -1,11 +1,16 @@
 package model;
 
+import model.annotation.Id;
+import model.annotation.Positive;
+
 public abstract class Account implements Transactable, InterestBearing {
 
     private static long accountCounter = 0;
 
+    @Id
     private final String accountNumber;
     private String ownerName;
+    @Positive
     private long balance;
     private boolean active;
 
@@ -25,6 +30,7 @@ public abstract class Account implements Transactable, InterestBearing {
         return String.format("AC%04d", accountCounter);
     }
 
+    @Override
     public void deposit(long amount) {
         if (amount <= 0) {
             return;
@@ -32,6 +38,7 @@ public abstract class Account implements Transactable, InterestBearing {
         balance += amount;
     }
 
+    @Override
     public boolean withdraw(long amount) {
         if (amount <= 0 || !canWithdraw(amount)) {
             return false;
@@ -40,6 +47,7 @@ public abstract class Account implements Transactable, InterestBearing {
         return true;
     }
 
+    @Override
     public abstract double interestRate();
 
     public abstract boolean canWithdraw(long amount);
